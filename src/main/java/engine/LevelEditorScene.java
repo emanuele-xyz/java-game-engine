@@ -3,6 +3,7 @@ package engine;
 import org.joml.Vector2f;
 import org.lwjgl.BufferUtils;
 import renderer.ShaderProgram;
+import util.Time;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -99,6 +100,7 @@ public final class LevelEditorScene extends Scene {
 
         defaultShader.uploadMath4f("uProjection", camera.getProjectionMatrix());
         defaultShader.uploadMath4f("uView", camera.getViewMatrix());
+        defaultShader.uploadFloat("uTime", Time.getTime());
 
         // Bind the VAO
         glBindVertexArray(vaoID);
