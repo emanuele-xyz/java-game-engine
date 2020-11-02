@@ -1,5 +1,7 @@
 package engine;
 
+import components.FontRenderer;
+import components.SpriteRenderer;
 import org.joml.Vector2f;
 import org.lwjgl.BufferUtils;
 import renderer.ShaderProgram;
@@ -17,6 +19,9 @@ public final class LevelEditorScene extends Scene {
 
     private ShaderProgram defaultShader;
     private Texture testTexture;
+
+    private GameObject testObj;
+    private boolean firstTime = true;
 
     private int vertexID;
     private int fragmentID;
@@ -43,6 +48,12 @@ public final class LevelEditorScene extends Scene {
 
     @Override
     public void init() {
+
+        System.out.println("Creating test object");
+        this.testObj = new GameObject("test object");
+        this.testObj.addComponent(new SpriteRenderer());
+        this.testObj.addComponent(new FontRenderer());
+        this.addGameObjectToScene(this.testObj);
 
         this.camera = new Camera(new Vector2f(-200, -300));
 
@@ -133,5 +144,17 @@ public final class LevelEditorScene extends Scene {
         glBindVertexArray(0);
 
         defaultShader.detach();
+
+        if (firstTime) {
+            System.out.println("Creating game object");
+            GameObject go = new GameObject("Game TEst 2");
+            go.addComponent(new SpriteRenderer());
+            this.addGameObjectToScene(go);
+            firstTime = false;
+        }
+
+        for (GameObject go : this.gameObjects) {
+            go.update(dt);
+        }
     }
 }
