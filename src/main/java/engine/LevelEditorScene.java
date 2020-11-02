@@ -3,6 +3,7 @@ package engine;
 import org.joml.Vector2f;
 import org.lwjgl.BufferUtils;
 import renderer.ShaderProgram;
+import renderer.Texture;
 import util.Time;
 
 import java.nio.FloatBuffer;
@@ -15,16 +16,17 @@ import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 public final class LevelEditorScene extends Scene {
 
     private ShaderProgram defaultShader;
+    private Texture testTexture;
 
     private int vertexID;
     private int fragmentID;
 
     private float[] vertexArray = {
-            // x y    z    // red  green  blue  alpha                      // index
-            100, 0,   0,      1.0f, 0.0f, 0.0f, 1.0f,     // bottom right       0
-            0,   100, 0,      0.0f, 1.0f, 0.0f, 1.0f,     // top    left        1
-            100, 100, 0,      0.0f, 0.0f, 1.0f, 1.0f,     // top    right       2
-            0,   0,   0,      1.0f, 1.0f, 0.0f, 1.0f,     // bottom left        3
+            // x y    z    // red  green  blue  alpha   // uv                        // index
+            100, 0,   0,      1.0f, 0.0f, 0.0f, 1.0f,     1, 1,     // bottom right       0
+            0,   100, 0,      0.0f, 1.0f, 0.0f, 1.0f,     0, 0,     // top    left        1
+            100, 100, 0,      1.0f, 0.0f, 1.0f, 1.0f,     1, 0,     // top    right       2
+            0,   0,   0,      1.0f, 1.0f, 0.0f, 1.0f,     0, 1,     // bottom left        3
     };
 
     // IMPORTANT: Must be counter clockwise order
@@ -42,7 +44,7 @@ public final class LevelEditorScene extends Scene {
     @Override
     public void init() {
 
-        this.camera = new Camera(new Vector2f());
+        this.camera = new Camera(new Vector2f(-200, -300));
 
         // Create shader program
         defaultShader = new ShaderProgram(
@@ -50,6 +52,8 @@ public final class LevelEditorScene extends Scene {
                 "assets/shaders/default-fragment-shader.glsl"
         );
         defaultShader.compile();
+
+        testTexture = new Texture("assets/images/test-image.png");
 
         // ---------------------------------------------------------------
         // Generate VAO, VBO, EBO buffer objects and send them to the GPU
@@ -78,8 +82,9 @@ public final class LevelEditorScene extends Scene {
         // Add the vertex attribute pointers
         int positionsSize = 3;
         int colorSize = 4;
-        int floatSizeBytes = 4;
-        int vertexSizeBytes = (positionsSize + colorSize) * floatSizeBytes;
+        int uvSize = 2;
+        int floatSizeBytes = Float.BYTES;
+        int vertexSizeBytes = (positionsSize + colorSize + uvSize) * floatSizeBytes;
 
         // Position attribute
         glVertexAttribPointer(0, positionsSize, GL_FLOAT, false, vertexSizeBytes, 0);
@@ -88,6 +93,10 @@ public final class LevelEditorScene extends Scene {
         // Color attribute
         glVertexAttribPointer(1, colorSize, GL_FLOAT, false, vertexSizeBytes, positionsSize * floatSizeBytes);
         glEnableVertexAttribArray(1);
+
+        // UV coordinates attribute
+        glVertexAttribPointer(2, uvSize, GL_FLOAT, false, vertexSizeBytes, (positionsSize + colorSize) * floatSizeBytes);
+        glEnableVertexAttribArray(2);
     }
 
     @Override
@@ -97,6 +106,12 @@ public final class LevelEditorScene extends Scene {
 
         // Bind shader program
         defaultShader.use();
+
+        // Upload texture to shader
+        defaultShader.uploadTexture("TEX_SAMPLER", 0);
+        // Activate slot 0
+        glActiveTexture(GL_TEXTURE0);
+        testTexture.bind();
 
         defaultShader.uploadMath4f("uProjection", camera.getProjectionMatrix());
         defaultShader.uploadMath4f("uView", camera.getViewMatrix());
