@@ -3,13 +3,9 @@ package engine;
 import components.SpriteRenderer;
 import org.joml.Vector2f;
 import org.joml.Vector4f;
-import renderer.ShaderProgram;
-import renderer.Texture;
+import util.AssetPool;
 
 public final class LevelEditorScene extends Scene {
-
-    private ShaderProgram defaultShader;
-    private Texture testTexture;
 
     public LevelEditorScene() {
 
@@ -17,6 +13,10 @@ public final class LevelEditorScene extends Scene {
 
     @Override
     public void init() {
+
+        // All resources must be loaded before they are used
+        loadResources();
+
         this.camera = new Camera(new Vector2f());
         int xOffset = 10;
         int yOffset = 10;
@@ -25,7 +25,6 @@ public final class LevelEditorScene extends Scene {
         float totalHeight = (300 - yOffset * 2);
         float sizeX = totalWidth / 100.0f;
         float sizeY = totalHeight / 100.0f;
-
 
         for (int x = 0; x < 100; x++) {
             for (int y = 0; y < 100; y++) {
@@ -37,6 +36,15 @@ public final class LevelEditorScene extends Scene {
                 addGameObjectToScene(go);
             }
         }
+
+    }
+
+    private void loadResources() {
+        AssetPool.loadShader(
+                "default",
+                "assets/shaders/default-vertex-shader.glsl",
+                "assets/shaders/default-fragment-shader.glsl"
+        );
     }
 
     @Override

@@ -9,7 +9,7 @@ public abstract class Scene {
 
     protected Camera camera;
     protected final List<GameObject> gameObjects = new ArrayList<>();
-    protected  Renderer renderer = new Renderer();
+    protected Renderer renderer = new Renderer();
     private boolean isRunning = false;
 
     public Scene() {

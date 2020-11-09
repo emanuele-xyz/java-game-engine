@@ -17,7 +17,7 @@ public final class Renderer {
     }
 
     public void add(GameObject gameObject) {
-        SpriteRenderer spr =gameObject.getComponent(SpriteRenderer.class);
+        SpriteRenderer spr = gameObject.getComponent(SpriteRenderer.class);
         if (spr != null) {
             add(spr);
         }
